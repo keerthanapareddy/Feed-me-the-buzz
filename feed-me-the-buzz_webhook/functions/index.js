@@ -37,11 +37,7 @@ var activity = {};
 var activity_in_sentence = [];
 var moods = {};
 
-const generateString = () => {
-  var grammar = tracery.createGrammar(grammarSource);
-  grammar.addModifiers(tracery.baseEngModifiers);
-  return grammar.flatten("#" + origin + "#");
-}
+
 
 var grammarSource = {
   // 'origin': '#[#number#][#plural_nouns#][#netflixCategories#][#verbsPast#][#adverb_in_sentence#]story#',
@@ -63,6 +59,12 @@ var grammarSource = {
   // 'activity_in_sentence':activity_in_sentence,
   // 'moods':moods
 };
+
+const generateString = () => {
+  var grammar = tracery.createGrammar(grammarSource);
+  grammar.addModifiers(tracery.baseEngModifiers);
+  return grammar.flatten("#origin#");
+}
 
 
 app.intent('Default Welcome Intent', conv => {
