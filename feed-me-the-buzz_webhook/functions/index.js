@@ -51,7 +51,7 @@ var grammarSource = {
 
   'number':['10','14','12','3','8','6','15','5'],
   'plural_nouns':['gifs','clips','sets','pairs','sentences','articles','tricks','Youtube videos'],  //10
-  'netflixCategories': _.sample(netflixCategoriesParsed.categories),
+  'netflixCategories': netflixCategoriesParsed.categories,
   // 'verbsPast' :verbs,
  	'adverb_in_sentence': _.sample(adverbsParsed.adverbs)
   // 'fortuneSentences':_.flatten(fortuneSentences),
@@ -78,7 +78,7 @@ app.intent('Get article', conv => {
 
 app.intent('Get article - yes', conv => {
   let randomString = generateString();
-  conv.close(`Here is the first ${_.flatten(randomString)}`);
+  conv.ask(`Here is the first ${randomString}`);
 });
 
 app.intent('Get article - no', conv => {
