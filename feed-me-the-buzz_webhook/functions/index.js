@@ -9,7 +9,6 @@ const _ = require('lodash')
 const fs = require('fs');
 const activitiesRaw = fs.readFileSync('activities.json');
 const activitiesParsed = JSON.parse(activitiesRaw);
-console.log(activitiesParsed);
 
 const adverbsRaw = fs.readFileSync('adverbs.json');
 const adverbsParsed = JSON.parse(adverbsRaw);
@@ -28,6 +27,8 @@ const verbsParsed = JSON.parse(verbsRaw);
 
 const app = dialogflow();
 
+var count = 0;
+
 let outputP;
 var adverb = {};
 var verbs = [];
@@ -40,12 +41,22 @@ var moods = {};
 
 var grammarSource = {
   'origin': ['#story#'],
-  'story': ['Would you be interested in #number# #plural_nouns# that #adverb# #verbsPast# #fortune#',
-            'Would you read an article  Here is why #activity# #will# make you feel #moods#',
-            'Would you prefer #activity# over #activity#',
+  'story': ['Do you prefer #activity# over #activity#',
             'Do you enjoy #activity#',
-            'Do you think you are #fortune#'
+            'Do you think you are #fortune#',
+            'Do you sometimes feel #moods#'
            ],
+    'result':['#resultPrefix# #resultSentence#'],
+
+  'resultSentence':['#number# #plural_nouns# that #adverb# #verbsPast# #fortune#',
+            'Here is why #activity# #will# make you feel #moods#'
+          ],
+
+  'resultPrefix':['You got',
+                  'Your result is',
+                  'The buzzfeed article you got is',
+                  'The buzzfeed article you should read next is'
+                ],
 
 
   'number':['10','7','12','3','8','6','9','5','4','2'],
@@ -67,9 +78,16 @@ const generateString = () => {
   return grammar.flatten("#origin#");
 }
 
+const resultStringFunction = () => {
+  var grammar = tracery.createGrammar(grammarSource);
+  grammar.addModifiers(tracery.baseEngModifiers);
+  return grammar.flatten("#result#");
+}
+
+
 
 app.intent('Default Welcome Intent', conv => {
-  conv.ask('Hello, Welcome to Feed me the buzz. I can tell you the next Buzzfeed article you should read based on your answers. Shall we start?');
+  conv.ask('Hello, Welcome to Feed me the buzz. Answer these 5 questions, and I can tell you the next article you should read on the internet. Shall we start?');
 });
 
 
@@ -80,24 +98,18 @@ app.intent('Default Welcome Intent - no', conv => {
 
 app.intent('Get article', conv => {
   let randomString = generateString();
-  conv.ask(`${randomString}`);
+  let resultString = resultStringFunction();
+  count = count + 1;
+  if(count < 6){
+    conv.ask(`${randomString}`);
+  }else if(count > 6 || count == 6){
+    conv.close(`${resultString}`);
+  }
 });
 
-app.intent('Get article - yes', conv => {
-  let randomString = generateString();
-  conv.ask(`${randomString}`);
+app.intent('Quit', conv => {
+  conv.close('No worries! Have a good day');
 });
 
-app.intent('Get article - no', conv => {
-  let randomString = generateString();
-  conv.ask(`${randomString}`);
-});
 
 exports.feedMeTheBuzz = functions.https.onRequest(app);
-
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
