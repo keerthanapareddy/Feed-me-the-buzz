@@ -9,6 +9,7 @@ const _ = require('lodash')
 const fs = require('fs');
 const activitiesRaw = fs.readFileSync('activities.json');
 const activitiesParsed = JSON.parse(activitiesRaw);
+console.log(activitiesParsed);
 
 const adverbsRaw = fs.readFileSync('adverbs.json');
 const adverbsParsed = JSON.parse(adverbsRaw);
@@ -31,81 +32,36 @@ let outputP;
 var adverb = {};
 var verbs = [];
 var netflixCategories = {};
-// var fortune = {};
+var fortune = {};
 var fortuneSentences =[];
 var activity = {};
-var activity_in_sentence = [];
 var moods = {};
 
 
-const fortuneFunction = () => {
-    fortuneTellingParsed.tarot_interpretations.forEach(interpretation => {
-    fortuneSentences.push(interpretation.meanings.light);
-    return fortuneSentences;
-    console.log(fortuneSentences);
-});
-
-}
-
-let fortuneWork = fortuneFunction();
-
 var grammarSource = {
-  'origin': ['Working yayyy #fortune#'],
-  // 'story': ['#number# #plural_nouns# that #adverb_in_sentence# #verbsPast# #fortuneSentences#',
-  //          'Here is why #activity_in_sentence# #will# make you feel #moods#'
-  //          ],
+  'origin': ['#story#'],
+  'story': ['Would you be interested in #number# #plural_nouns# that #adverb# #verbsPast# #fortune#',
+            'Would you read an article  Here is why #activity# #will# make you feel #moods#',
+            'Would you prefer #activity# over #activity#',
+            'Do you enjoy #activity#',
+            'Do you think you are #fortune#'
+           ],
 
-  // 'story':['I am feeling #fortuneSentences#'],
-  // 'origin': ['I am #number# #netflixCategories#'],
-  // 'story': ['#number# #plural_nouns# that #adverb_in_sentence# #verbsPast# #fortuneSentences#',
-  //          'Here is why #activity_in_sentence# #will# make you feel #moods#'
-  //          ],
 
-  'number':['10','14','12','3','8','6','15','5'],
+  'number':['10','7','12','3','8','6','9','5','4','2'],
   'plural_nouns':['gifs','clips','sets','pairs','sentences','articles','tricks','Youtube videos'],  //10
   'netflixCategories': netflixCategoriesParsed.categories,
-  'verbsPast' :verbs,
+  'verbsPast' :verbsParsed.verbs,
  	'adverb': adverbsParsed.adverbs,
-  'fortune': fortuneWork,
+  'fortune': fortuneTellingParsed.fortune,
   'will':['could','would','will','can'],
-  'activity_in_sentence':activity_in_sentence,
+  'activity': activitiesParsed.activities,
   'moods': moodsParsed.moods
 };
 
 
 
 const generateString = () => {
-
-
-
-    //fortune telling
-    // for(var i = 0; i<fortuneTellingParsed.tarot_interpretations.length; i++){
-    //   for(var j = 0; j<fortuneTellingParsed.tarot_interpretations[i].meanings.light.length; j++){
-    //   	fortuneSentences.push(fortuneTelling.tarot_interpretations[i].meanings.light[j]);
-    //   	 // print(fortuneTelling.tarot_interpretations[i].meanings.light[j]);
-    //     return fortuneSentences;
-    //   }
-    // }
-
-  /*
-  //verbs
-  for(var i = 0; i< verbsPast.verbs.length; i++){
-   verbs.push(verbsPast.verbs[i].past);
-    grammarSource.verbsPast = verbs;
-  }
-
-
-
-
-  //activity
-  for(var i = 0; i < activity.categories.length; i++){
-    for(var j = 0; j < activity.categories[i].examples.length; j++){
-   	 activity_in_sentence.push(activity.categories[i].examples[j]);
-    	grammarSource.activity_in_sentence = activity_in_sentence;
-    }
-  }
-  */
-
   var grammar = tracery.createGrammar(grammarSource);
   grammar.addModifiers(tracery.baseEngModifiers);
   return grammar.flatten("#origin#");
@@ -113,27 +69,29 @@ const generateString = () => {
 
 
 app.intent('Default Welcome Intent', conv => {
-  conv.ask('Hello, Welcome to Feed me the buzz. I can tell you the next Buzzfeed article you should read based on your interest in the 10 articles I present to you. Shall we start?');
-});
-
-app.intent('Get article', conv => {
-  conv.ask(' Shall we start?');
+  conv.ask('Hello, Welcome to Feed me the buzz. I can tell you the next Buzzfeed article you should read based on your answers. Shall we start?');
 });
 
 
-app.intent('Get article - yes', conv => {
-  let randomString = generateString();
-  conv.ask(`Here is the first one! ${randomString}`);
-});
-
-app.intent('Get article - no', conv => {
+app.intent('Default Welcome Intent - no', conv => {
   conv.close('No worries! Have a good day');
 });
 
 
+app.intent('Get article', conv => {
+  let randomString = generateString();
+  conv.ask(`${randomString}`);
+});
 
+app.intent('Get article - yes', conv => {
+  let randomString = generateString();
+  conv.ask(`${randomString}`);
+});
 
-
+app.intent('Get article - no', conv => {
+  let randomString = generateString();
+  conv.ask(`${randomString}`);
+});
 
 exports.feedMeTheBuzz = functions.https.onRequest(app);
 
