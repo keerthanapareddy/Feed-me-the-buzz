@@ -41,10 +41,12 @@ var moods = {};
 
 var grammarSource = {
   'origin': ['#story#'],
-  'story': ['Do you prefer #activity# over #activity#',
+  'story': ['Do you think #activity# is finer than #activity#',
             'Do you enjoy #activity#',
             'Do you think you are #fortune#',
-            'Do you sometimes feel #moods#'
+            'Do you sometimes feel #moods#',
+            'Does #activity# make you #moods#',
+            'Do you feel #moods# while watching #netflixCategories#'
            ],
     'result':['#resultPrefix# #resultSentence#'],
 
@@ -87,7 +89,7 @@ const resultStringFunction = () => {
 
 
 app.intent('Default Welcome Intent', conv => {
-  conv.ask('Hello, Welcome to Feed me the buzz. Answer these 5 questions, and I can tell you the next article you should read on the internet. Shall we start?');
+  conv.ask('Hello, Welcome to Feed me the buzz. Answer these 10 questions, and I can tell you the next Buzzfeed article you should read on the internet. Shall we start?');
 });
 
 
@@ -100,9 +102,9 @@ app.intent('Get article', conv => {
   let randomString = generateString();
   let resultString = resultStringFunction();
   count = count + 1;
-  if(count < 6){
+  if(count < 10){
     conv.ask(`${randomString}`);
-  }else if(count > 6 || count == 6){
+  }else if(count > 10 || count == 10){
     conv.close(`${resultString}`);
   }
 });
